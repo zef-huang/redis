@@ -39,10 +39,35 @@ int get_sds_len(sds* s){
 }
 
 
+// 2.字符串拼接，如果长度不够则计算所需要空间，然后 *2 扩展空间
+void sdscat(sds* s1, char* s2){
+    int len_s2 = strlen(s2);
+    if (s1 -> free > len_s2) {
+        strcat(s1 -> buf, s2);
+        s1 -> len += len_s2;
+        s1 -> free -= len_s2;
+    } else {
+        int total_len = s1->len + len_s2;
+        s1 -> buf = realloc(s1 -> buf, total_len * 2 + 1);
+        strcat(s1 -> buf, s2);
+        s1 -> len = total_len;
+        s1 -> free = total_len;
+    }
+    
+}
+
+
 int main()
 {
-    sds* s = sdsnew("hello world\n");
-    printf("%s", s -> buf);
-    printf("sds len is %d\n", s -> len);
+    sds* s1 = sdsnew("hello world\n");
+    printf("%s", s1 -> buf);
+    printf("sds len is %d\n", s1 -> len);
+    printf("sds free is %d\n", s1 -> free);
+
+    sdscat(s1, "!!!");
+    printf("%s", s1 -> buf);
+    printf("sds len is %d\n", s1 -> len);
+    printf("sds free is %d\n", s1 -> free);
+    
     return 0;
 }
